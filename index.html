@@ -475,7 +475,7 @@
     </div>
     
     <div class="particles" id="particles"></div>
-
+    
     <script>
         // Initialize Telegram Web App
         const tg = window.Telegram.WebApp;
@@ -613,8 +613,13 @@
             const discordNick = document.getElementById('discordNick').value.trim();
             const code = document.getElementById('code').value.trim();
             
-            if (!discordNick || !code) {
-                tg.showAlert('Пожалуйста, заполните оба поля!');
+            if (!discordNick) {
+                tg.showAlert('Пожалуйста, введите ваш Discord никнейм!');
+                return;
+            }
+            
+            if (!code) {
+                tg.showAlert('Пожалуйста, введите код!');
                 return;
             }
             
@@ -629,10 +634,33 @@
                     code: code 
                 };
                 
-                tg.sendData(JSON.stringify(data));
-                tg.close();
+                try {
+                    tg.sendData(JSON.stringify(data));
+                } catch (e) {
+                    loading.style.display = 'none';
+                    tg.showAlert('Ошибка отправки: ' + e.message);
+                    return;
+                }
+                
+                // Закрываем через 1 секунду после отправки
+                setTimeout(() => {
+                    tg.close();
+                }, 1000);
             }, 1500);
         }
+        
+        // Обработка нажатия Enter в полях ввода
+        document.getElementById('discordNick').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('code').focus();
+            }
+        });
+        
+        document.getElementById('code').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitData();
+            }
+        });
     </script>
 </body>
 </html>
