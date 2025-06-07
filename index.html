@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Угадай код | Игра</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            animation: fadeIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .input-field {
+            position: relative;
+        }
+        
+        .input-field i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6a11cb;
+            font-size: 1.2rem;
+        }
+        
+        input {
+            width: 100%;
+            padding: 16px 16px 16px 50px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        input:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(106, 17, 203, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn i {
+            margin-right: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 25px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 25px 20px;
+            }
+            
+            input {
+                padding: 14px 14px 14px 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-lock"></i> Угадай код</h1>
+            <p>Введите ваш Discord ник и код для участия в игре</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-group">
+                <label for="nickname"><i class="fas fa-user"></i> Ваш ник в Discord</label>
+                <div class="input-field">
+                    <i class="fab fa-discord"></i>
+                    <input 
+                        type="text" 
+                        id="nickname" 
+                        placeholder="Например: GamerPro#1234"
+                    >
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="code"><i class="fas fa-key"></i> Введите код</label>
+                <div class="input-field">
+                    <i class="fas fa-code"></i>
+                    <input 
+                        type="text" 
+                        id="code" 
+                        placeholder="Введите код, который вы нашли"
+                    >
+                </div>
+            </div>
+            
+            <button class="btn" onclick="submitData()">
+                <i class="fas fa-paper-plane"></i> Отправить код
+            </button>
+        </div>
+        
+        <div class="footer">
+            После отправки форма закроется автоматически
+        </div>
+    </div>
+
+    <script>
+        function submitData() {
+            const nickname = document.getElementById('nickname').value.trim();
+            const code = document.getElementById('code').value.trim();
+            
+            if (!nickname) {
+                alert('Пожалуйста, введите ваш Discord ник!');
+                return;
+            }
+            
+            if (!code) {
+                alert('Пожалуйста, введите код!');
+                return;
+            }
+            
+            // Отправляем данные в бота
+            Telegram.WebApp.sendData(JSON.stringify({
+                nickname: nickname,
+                code: code
+            }));
+            
+            // Закрываем Web App
+            Telegram.WebApp.close();
+        }
+    </script>
+</body>
+</html>
