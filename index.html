@@ -347,6 +347,15 @@
             text-shadow: 0 0 10px rgba(255, 100, 0, 0.5);
         }
 
+        .error-message {
+            color: #ff4d4d;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 15;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
@@ -448,16 +457,18 @@
                 <i class="fab fa-discord"></i>
                 <span>Твой Discord Никнейм</span>
             </label>
-            <input type="text" id="discordNick" placeholder="Введи свой никнейм в Discord">
+            <input type="text" id="discordNick" placeholder="Введи свой никнейм в Discord" maxlength="100">
         </div>
         
         <div class="input-group">
             <label for="code">
                 <i class="fas fa-key"></i>
-                <span>Найденый Код</span>
+                <span>Найденный Код</span>
             </label>
-            <input type="text" id="code" placeholder="Введи разгаданный код">
+            <input type="text" id="code" placeholder="Введи разгаданный код" maxlength="50">
         </div>
+        
+        <div class="error-message" id="errorMessage"></div>
         
         <button class="btn-submit" onclick="submitData()">
             <i class="fas fa-paper-plane"></i>
@@ -475,7 +486,7 @@
     </div>
     
     <div class="particles" id="particles"></div>
-    
+
     <script>
         // Initialize Telegram Web App
         const tg = window.Telegram.WebApp;
@@ -612,55 +623,62 @@
         function submitData() {
             const discordNick = document.getElementById('discordNick').value.trim();
             const code = document.getElementById('code').value.trim();
+            const errorMessage = document.getElementById('errorMessage');
+            const loading = document.getElementById('loading');
             
-            if (!discordNick) {
-                tg.showAlert('Пожалуйста, введите ваш Discord никнейм!');
+            // Reset error message
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+            
+            // Validate inputs
+            if (!discordNick || !code) {
+                errorMessage.textContent = 'Пожалуйста, заполните оба поля!';
+                errorMessage.style.display = 'block';
                 return;
             }
             
-            if (!code) {
-                tg.showAlert('Пожалуйста, введите код!');
+            // Validate Discord nickname (basic check for length and characters)
+            if (discordNick.length < 2 || discordNick.length > 100 || /[<>{}]/.test(discordNick)) {
+                errorMessage.textContent = 'Недопустимый Discord никнейм!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Validate code format (example: check for length or specific pattern if needed)
+            if (code.length < 5 || code.length > 50) {
+                errorMessage.textContent = 'Код должен быть от 5 до 50 символов!';
+                errorMessage.style.display = 'block';
                 return;
             }
             
             // Show loading animation
-            const loading = document.getElementById('loading');
             loading.style.display = 'flex';
             
-            // Simulate a short delay for better UX
-            setTimeout(() => {
+            // Disable submit button to prevent multiple submissions
+            const submitButton = document.querySelector('.btn-submit');
+            submitButton.disabled = true;
+            
+            // Send data to Telegram bot
+            try {
                 const data = { 
                     discordNick: discordNick,
                     code: code 
                 };
                 
-                try {
-                    tg.sendData(JSON.stringify(data));
-                } catch (e) {
-                    loading.style.display = 'none';
-                    tg.showAlert('Ошибка отправки: ' + e.message);
-                    return;
-                }
+                tg.sendData(JSON.stringify(data));
                 
-                // Закрываем через 1 секунду после отправки
+                // Keep loading animation for a moment before closing
                 setTimeout(() => {
+                    loading.style.display = 'none';
                     tg.close();
-                }, 1000);
-            }, 1500);
+                }, 1500);
+            } catch (error) {
+                errorMessage.textContent = 'Ошибка при отправке данных!';
+                errorMessage.style.display = 'block';
+                loading.style.display = 'none';
+                submitButton.disabled = false;
+            }
         }
-        
-        // Обработка нажатия Enter в полях ввода
-        document.getElementById('discordNick').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('code').focus();
-            }
-        });
-        
-        document.getElementById('code').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitData();
-            }
-        });
     </script>
 </body>
 </html>
