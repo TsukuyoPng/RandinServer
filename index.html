@@ -3,232 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎮 Randin challenge</title>
+    <title>Randin Challenge | CSB</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a0000, #450000, #1a0000);
+            color: #fff;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px;
             overflow: hidden;
-            animation: fadeIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
-        
-        .header {
-            background: linear-gradient(90deg, #6a11cb, #2575fc);
-            padding: 30px 20px;
-            text-align: center;
-            color: white;
+
+        #triangles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
-        
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .header p {
+
+        .csb-badge {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: linear-gradient(45deg, #ff0000, #b30000);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: bold;
             font-size: 1.1rem;
-            opacity: 0.9;
-            max-width: 400px;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4);
+            z-index: 20;
+            animation: pulse 2s infinite;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 500px;
+            padding: 50px 35px 40px;
+            background: rgba(10, 0, 0, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out, float 6s infinite ease-in-out;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #ff0000, #ff6a00);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h2 {
+            font-size: 2.4rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to right, #ff4d4d, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 1.1rem;
+            max-width: 80%;
             margin: 0 auto;
+            line-height: 1.6;
         }
-        
-        .content {
-            padding: 30px;
-        }
-        
+
         .input-group {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            position: relative;
         }
-        
+
         .input-group label {
             display: block;
             margin-bottom: 10px;
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: 500;
+            margin-left: 5px;
         }
-        
-        .input-field {
-            position: relative;
-        }
-        
-        .input-field i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6a11cb;
-            font-size: 1.2rem;
-        }
-        
-        input {
+
+        .input-group input {
             width: 100%;
-            padding: 16px 16px 16px 50px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1.1rem;
+            padding: 16px 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            font-size: 1.05rem;
             transition: all 0.3s ease;
             outline: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
-        input:focus {
-            border-color: #6a11cb;
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+
+        .input-group input:focus {
+            border-color: rgba(255, 150, 50, 0.8);
+            box-shadow: 0 0 0 3px rgba(255, 100, 0, 0.3);
         }
-        
-        .btn {
-            display: block;
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .btn-submit {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(90deg, #6a11cb, #2575fc);
-            color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #ff0000, #ff6a00);
+            color: white;
             font-size: 1.2rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 15px rgba(106, 17, 203, 0.4);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.5);
+            letter-spacing: 1px;
+            margin-top: 15px;
         }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(106, 17, 203, 0.5);
+
+        .btn-submit:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 0, 0, 0.7);
         }
-        
-        .btn:active {
-            transform: translateY(-1px);
+
+        .btn-submit:active {
+            transform: translateY(2px);
         }
-        
-        .btn i {
-            margin-right: 10px;
+
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20px;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(25deg);
+            transition: all 0.6s;
         }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            border-top: 1px solid #eee;
+
+        .btn-submit:hover::after {
+            left: 120%;
         }
-        
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 200, 100, 0.7);
+            border-radius: 50%;
+            animation: floatParticle 15s infinite linear;
+        }
+
         @keyframes fadeIn {
-            from {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(0) translateX(0);
                 opacity: 0;
-                transform: translateY(30px);
             }
-            to {
+            10% {
                 opacity: 1;
-                transform: translateY(0);
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(20px);
+                opacity: 0;
             }
         }
-        
-        @media (max-width: 480px) {
-            .header {
-                padding: 25px 15px;
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 5px 30px rgba(255, 0, 0, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4); }
+        }
+
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 100, 0, 0.4) 0%, rgba(255, 50, 0, 0) 70%);
+            filter: blur(40px);
+            z-index: 1;
+        }
+
+        .glow-1 {
+            top: 10%;
+            left: 10%;
+        }
+
+        .glow-2 {
+            bottom: 15%;
+            right: 15%;
+        }
+
+        .glow-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.3) 0%, rgba(255, 0, 0, 0) 70%);
+        }
+
+        .info-text {
+            text-align: center;
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 25px 35px;
             }
             
-            .header h1 {
-                font-size: 1.8rem;
+            .header h2 {
+                font-size: 2rem;
             }
             
-            .content {
-                padding: 25px 20px;
-            }
-            
-            input {
-                padding: 14px 14px 14px 45px;
+            .csb-badge {
+                top: 15px;
+                right: 15px;
+                padding: 6px 15px;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    
+    <div class="csb-badge">CSB</div>
+    
+    <canvas id="triangles-canvas"></canvas>
+    
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-lock"></i> Угадай секретный код</h1>
-            <p>Введите ваш Discord ник и код для участия в игре</p>
+            <h2>Randin Challenge</h2>
+            <p>Введи найденый код, чтобы выиграть розыгрыш</p>
         </div>
         
-        <div class="content">
-            <div class="input-group">
-                <label for="nickname"><i class="fas fa-user"></i> Ваш ник в Discord</label>
-                <div class="input-field">
-                    <i class="fab fa-discord"></i>
-                    <input 
-                        type="text" 
-                        id="nickname" 
-                        placeholder="Например: GamerPro"
-                    >
-                </div>
-            </div>
-            
-            <div class="input-group">
-                <label for="code"><i class="fas fa-key"></i> Введите код</label>
-                <div class="input-field">
-                    <i class="fas fa-code"></i>
-                    <input 
-                        type="text" 
-                        id="code" 
-                        placeholder="Введите код, который вы нашли"
-                    >
-                </div>
-            </div>
-            
-            <button class="btn" onclick="submitData()">
-                <i class="fas fa-paper-plane"></i> Отправить код
-            </button>
+        <div class="input-group">
+            <label for="discordNick">Твой Discord Никнейм</label>
+            <input type="text" id="discordNick" placeholder="Введи свой никнейм в Discord">
         </div>
         
-        <div class="footer">
-            После отправки форма закроется автоматически
+        <div class="input-group">
+            <label for="code">Найденый Код</label>
+            <input type="text" id="code" placeholder="Введи разгаданный код">
+        </div>
+        
+        <button class="btn-submit" onclick="submitData()">ОТПРАВИТЬ</button>
+        
+        <div class="info-text">
+            <p>После ввода информации нажмите кнопку для отправки информации.<br>Проверьте правильность введённого ника дискорд.</p>
         </div>
     </div>
+    
+    <div class="particles" id="particles"></div>
 
     <script>
+        // Initialize Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        
+        // Set theme colors from Telegram
+        document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#1a0000');
+        document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#ff9999');
+        document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#ff0000');
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
+        
+        // Floating triangles animation
+        const canvas = document.getElementById('triangles-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size to window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Triangle objects
+        const triangles = [];
+        const triangleCount = 40;
+        
+        // Create triangles
+        for (let i = 0; i < triangleCount; i++) {
+            triangles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: 5 + Math.random() * 20,
+                speed: 0.2 + Math.random() * 0.8,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.015,
+                color: `rgba(${Math.floor(200 + Math.random() * 55)}, ${Math.floor(50 + Math.random() * 50)}, ${Math.floor(50 + Math.random() * 50)}, ${0.1 + Math.random() * 0.25})`
+            });
+        }
+        
+        // Draw a triangle
+        function drawTriangle(t) {
+            ctx.beginPath();
+            ctx.moveTo(t.x + t.size * Math.cos(t.rotation), t.y + t.size * Math.sin(t.rotation));
+            ctx.lineTo(t.x + t.size * Math.cos(t.rotation + Math.PI * 2/3), t.y + t.size * Math.sin(t.rotation + Math.PI * 2/3));
+            ctx.lineTo(t.x + t.size * Math.cos(t.rotation + Math.PI * 4/3), t.y + t.size * Math.sin(t.rotation + Math.PI * 4/3));
+            ctx.closePath();
+            
+            // Create gradient for triangle
+            const gradient = ctx.createRadialGradient(
+                t.x, t.y, 0,
+                t.x, t.y, t.size * 1.5
+            );
+            gradient.addColorStop(0, t.color);
+            gradient.addColorStop(1, 'rgba(150, 0, 0, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Add glow effect
+            ctx.shadowColor = 'rgba(255, 100, 0, 0.5)';
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+        
+        // Animation loop
+        function animate() {
+            // Clear canvas with a transparent overlay for trailing effect
+            ctx.fillStyle = 'rgba(10, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Update and draw triangles
+            triangles.forEach(t => {
+                // Update position
+                t.y += t.speed;
+                t.x += Math.sin(t.y * 0.01) * 0.8;
+                t.rotation += t.rotationSpeed;
+                
+                // Reset position if out of view
+                if (t.y > canvas.height + 50) {
+                    t.y = -20;
+                    t.x = Math.random() * canvas.width;
+                }
+                
+                drawTriangle(t);
+            });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Start animation
+        animate();
+        
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 4 + 1;
+                const posX = Math.random() * 100;
+                const duration = Math.random() * 20 + 15;
+                const delay = Math.random() * 5;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.bottom = `-10px`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+                
+                // Random color for particles
+                const colors = ['#ff4d4d', '#ff9966', '#ffcc00', '#ff6600'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.background = color;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Create particles
+        createParticles();
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // Submit data function
         function submitData() {
-            const nickname = document.getElementById('nickname').value.trim();
+            const discordNick = document.getElementById('discordNick').value.trim();
             const code = document.getElementById('code').value.trim();
             
-            if (!nickname) {
-                alert('Пожалуйста, введите ваш Discord ник!');
+            if (!discordNick || !code) {
+                tg.showAlert('Пожалуйста, заполните оба поля!');
                 return;
             }
-            
-            if (!code) {
-                alert('Пожалуйста, введите код!');
-                return;
-            }
-            
-            // Отправляем данные в бота
-            Telegram.WebApp.sendData(JSON.stringify({
-                nickname: nickname,
-                code: code
-            }));
-            
-            // Закрываем Web App
-            Telegram.WebApp.close();
+
+            const data = { discordNick, code };
+            tg.sendData(JSON.stringify(data));
+            tg.close();
         }
     </script>
 </body>
