@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Randin Challenge | CSB</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,9 +13,21 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-gradient: linear-gradient(45deg, #ff0000, #ff6a00);
+            --dark-bg: #1a0000;
+            --darker-bg: #0d0000;
+            --glow-red: rgba(255, 100, 0, 0.4);
+            --glow-yellow: rgba(255, 200, 100, 0.7);
+            --card-bg: rgba(20, 0, 0, 0.8);
+            --border-color: rgba(255, 100, 100, 0.3);
+            --pulse-shadow: 0 5px 20px rgba(255, 0, 0, 0.4);
+            --text-glow: 0 0 10px rgba(255, 100, 0, 0.7);
+        }
+
         body {
             font-family: 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #1a0000, #450000, #1a0000);
+            background: linear-gradient(135deg, var(--dark-bg), #450000, var(--dark-bg));
             color: #fff;
             min-height: 100vh;
             overflow: hidden;
@@ -23,6 +36,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            perspective: 1000px;
         }
 
         #triangles-canvas {
@@ -38,16 +52,19 @@
             position: absolute;
             top: 25px;
             right: 25px;
-            background: linear-gradient(45deg, #ff0000, #b30000);
+            background: var(--primary-gradient);
             color: #fff;
             padding: 8px 18px;
             border-radius: 30px;
             font-weight: bold;
             font-size: 1.1rem;
             letter-spacing: 1px;
-            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4);
+            box-shadow: var(--pulse-shadow);
             z-index: 20;
             animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .container {
@@ -56,13 +73,14 @@
             width: 90%;
             max-width: 500px;
             padding: 50px 35px 40px;
-            background: rgba(10, 0, 0, 0.7);
+            background: var(--card-bg);
             backdrop-filter: blur(15px);
             border-radius: 25px;
-            border: 1px solid rgba(255, 100, 100, 0.3);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 50px rgba(255, 0, 0, 0.2);
             animation: fadeIn 0.8s ease-out, float 6s infinite ease-in-out;
             overflow: hidden;
+            transform-style: preserve-3d;
         }
 
         .container::before {
@@ -72,13 +90,16 @@
             left: 0;
             width: 100%;
             height: 5px;
-            background: linear-gradient(to right, #ff0000, #ff6a00);
+            background: var(--primary-gradient);
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+            z-index: 5;
         }
 
         .header {
             text-align: center;
             margin-bottom: 35px;
+            position: relative;
+            z-index: 15;
         }
 
         .header h2 {
@@ -87,48 +108,69 @@
             background: linear-gradient(to right, #ff4d4d, #ffb347);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            text-shadow: var(--text-glow);
             letter-spacing: 1px;
+            font-weight: 800;
+            position: relative;
+        }
+
+        .header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--primary-gradient);
+            border-radius: 10px;
         }
 
         .header p {
-            color: rgba(255, 255, 255, 0.75);
+            color: rgba(255, 255, 255, 0.85);
             font-size: 1.1rem;
-            max-width: 80%;
-            margin: 0 auto;
+            max-width: 90%;
+            margin: 25px auto 0;
             line-height: 1.6;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         .input-group {
             margin-bottom: 30px;
             position: relative;
+            z-index: 15;
         }
 
         .input-group label {
             display: block;
             margin-bottom: 10px;
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.95);
             font-size: 1rem;
             font-weight: 500;
             margin-left: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .input-group input {
             width: 100%;
             padding: 16px 25px;
             border-radius: 15px;
-            border: 1px solid rgba(255, 100, 100, 0.3);
+            border: 1px solid var(--border-color);
             background: rgba(0, 0, 0, 0.4);
             color: #fff;
             font-size: 1.05rem;
             transition: all 0.3s ease;
             outline: none;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-family: inherit;
         }
 
         .input-group input:focus {
             border-color: rgba(255, 150, 50, 0.8);
             box-shadow: 0 0 0 3px rgba(255, 100, 0, 0.3);
+            transform: translateY(-2px);
         }
 
         .input-group input::placeholder {
@@ -140,7 +182,7 @@
             padding: 18px;
             border: none;
             border-radius: 15px;
-            background: linear-gradient(45deg, #ff0000, #ff6a00);
+            background: var(--primary-gradient);
             color: white;
             font-size: 1.2rem;
             font-weight: 600;
@@ -151,6 +193,11 @@
             box-shadow: 0 10px 30px rgba(255, 0, 0, 0.5);
             letter-spacing: 1px;
             margin-top: 15px;
+            z-index: 15;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         .btn-submit:hover {
@@ -190,9 +237,114 @@
 
         .particle {
             position: absolute;
-            background: rgba(255, 200, 100, 0.7);
+            background: var(--glow-yellow);
             border-radius: 50%;
             animation: floatParticle 15s infinite linear;
+        }
+
+        .glow {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 100, 0, 0.4) 0%, rgba(255, 50, 0, 0) 70%);
+            filter: blur(40px);
+            z-index: 1;
+        }
+
+        .glow-1 {
+            top: 10%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            animation: glowMove 25s infinite alternate;
+        }
+
+        .glow-2 {
+            bottom: 15%;
+            right: 15%;
+            width: 250px;
+            height: 250px;
+            animation: glowMove 30s infinite alternate-reverse;
+        }
+
+        .glow-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.3) 0%, rgba(255, 0, 0, 0) 70%);
+            animation: glowPulse 8s infinite alternate;
+        }
+
+        .info-text {
+            text-align: center;
+            margin-top: 25px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 15;
+        }
+
+        .winner-banner {
+            position: absolute;
+            top: -20px;
+            right: -50px;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: #8b0000;
+            padding: 15px 50px;
+            transform: rotate(45deg);
+            font-weight: bold;
+            font-size: 1.1rem;
+            z-index: 25;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .event-date {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #ff9966;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 0, 0, 0.9);
+            z-index: 30;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 25px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 100, 100, 0.3);
+            border-top: 5px solid #ff6a00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            color: #ff9966;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(255, 100, 0, 0.5);
         }
 
         @keyframes fadeIn {
@@ -223,46 +375,24 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4); }
+            0% { transform: scale(1); box-shadow: var(--pulse-shadow); }
             50% { transform: scale(1.05); box-shadow: 0 5px 30px rgba(255, 0, 0, 0.7); }
-            100% { transform: scale(1); box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4); }
+            100% { transform: scale(1); box-shadow: var(--pulse-shadow); }
         }
 
-        .glow {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 100, 0, 0.4) 0%, rgba(255, 50, 0, 0) 70%);
-            filter: blur(40px);
-            z-index: 1;
+        @keyframes glowMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
         }
 
-        .glow-1 {
-            top: 10%;
-            left: 10%;
+        @keyframes glowPulse {
+            0% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
         }
 
-        .glow-2 {
-            bottom: 15%;
-            right: 15%;
-        }
-
-        .glow-3 {
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 0, 0, 0.3) 0%, rgba(255, 0, 0, 0) 70%);
-        }
-
-        .info-text {
-            text-align: center;
-            margin-top: 25px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-            line-height: 1.6;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 600px) {
@@ -280,6 +410,11 @@
                 padding: 6px 15px;
                 font-size: 1rem;
             }
+            
+            .event-date {
+                top: 15px;
+                left: 15px;
+            }
         }
     </style>
 </head>
@@ -288,30 +423,54 @@
     <div class="glow glow-2"></div>
     <div class="glow glow-3"></div>
     
-    <div class="csb-badge">CSB</div>
+    <div class="csb-badge">
+        <i class="fas fa-shield-alt"></i>
+        <span>CSB EVENT</span>
+    </div>
+    
+    <div class="event-date">
+        <i class="fas fa-calendar-day"></i>
+        <span>07.06.2025</span>
+    </div>
     
     <canvas id="triangles-canvas"></canvas>
     
     <div class="container">
+        <div class="winner-banner">ПРИЗОВОЙ РОЗЫГРЫШ</div>
+        
         <div class="header">
-            <h2>RandinLonescu Event</h2>
-            <p>Введи найденый код, чтобы выиграть розыгрыш</p>
+            <h2>RANDINLONESCU CHALLENGE</h2>
+            <p>Найди секретный код на сервере и введи его здесь, чтобы получить шанс выиграть эксклюзивные призы!</p>
         </div>
         
         <div class="input-group">
-            <label for="discordNick">Твой Discord Никнейм</label>
+            <label for="discordNick">
+                <i class="fab fa-discord"></i>
+                <span>Твой Discord Никнейм</span>
+            </label>
             <input type="text" id="discordNick" placeholder="Введи свой никнейм в Discord">
         </div>
         
         <div class="input-group">
-            <label for="code">Найденый Код</label>
+            <label for="code">
+                <i class="fas fa-key"></i>
+                <span>Найденый Код</span>
+            </label>
             <input type="text" id="code" placeholder="Введи разгаданный код">
         </div>
         
-        <button class="btn-submit" onclick="submitData()">ОТПРАВИТЬ</button>
+        <button class="btn-submit" onclick="submitData()">
+            <i class="fas fa-paper-plane"></i>
+            <span>ОТПРАВИТЬ</span>
+        </button>
         
         <div class="info-text">
-            <p>После ввода информации нажмите кнопку для отправки информации.<br>Проверьте правильность введённого ника дискорд.</p>
+            <p>После ввода информации нажмите кнопку для отправки данных.<br>Победители будут объявлены в Discord!</p>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Отправка данных...</div>
         </div>
     </div>
     
@@ -458,10 +617,21 @@
                 tg.showAlert('Пожалуйста, заполните оба поля!');
                 return;
             }
-
-            const data = { discordNick, code };
-            tg.sendData(JSON.stringify(data));
-            tg.close();
+            
+            // Show loading animation
+            const loading = document.getElementById('loading');
+            loading.style.display = 'flex';
+            
+            // Simulate a short delay for better UX
+            setTimeout(() => {
+                const data = { 
+                    discordNick: discordNick,
+                    code: code 
+                };
+                
+                tg.sendData(JSON.stringify(data));
+                tg.close();
+            }, 1500);
         }
     </script>
 </body>
